@@ -6,6 +6,13 @@ from analyzer import analyze_resume
 
 app = Flask(__name__)
 CORS(app)  # Allow access from GitHub Pages or other frontend
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"message": "API is running"}
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
