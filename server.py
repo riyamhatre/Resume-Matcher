@@ -1,45 +1,26 @@
-from fastapi import FastAPI, File, Form, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from flask import Flask, request, jsonify
+from analyzer import analyze_resume
 import tempfile
 import os
-from analyzer import analyze_resume
+from flask_cors import CORS
 
-app = FastAPI()
+app = Flask(__name__)
+CORS(app)  # allows frontend on GitHub Pages to call backend
 
-# Allow frontend like GitHub Pages to talk to this API
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Replace "*" with exact origin for production
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-class AnalysisResponse(BaseModel):
-    semantic_similarity: float
-    keyword_match_score: float
-    education_score: int
-    interview_likelihood: float
-    common_keywords: list[str]
-    missing_keywords: list[str]
-    readability_score: float
-
-@app.post("/analyze", response_model=AnalysisResponse)
-async def analyze_resume_endpoint(
-    resume: UploadFile = File(...),
-    job_description: str = Form(...)
-):
+@app.route("/analyze", methods=["POST"])
+def analyze():
     try:
+        file = request.files["resume"]
+        jd = request.form["job_description"]
+
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-            contents = await resume.read()
-            tmp.write(contents)
-            tmp_path = tmp.name
+            file.save(tmp.name)
+            result = analyze_resume(tmp.name, jd)
+            os.unlink(tmp.name)
 
-        result = analyze_resume(tmp_path, job_description)
-        os.remove(tmp_path)
-        return result
-
+        return jsonify(result)
     except Exception as e:
-        return JSONResponse(status_code=500, content={"error": str(e)})
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(debug=True)
