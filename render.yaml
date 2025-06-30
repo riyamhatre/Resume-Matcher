@@ -2,6 +2,6 @@ services:
   - type: web
     name: resume-matcher
     env: python
-    buildCommand: pip install -r requirements.txt && python nltk_downloader.py
+    buildCommand: pip install setuptools wheel && pip install -r requirements.txt && python nltk_downloader.py
     startCommand: uvicorn app:app --host 0.0.0.0 --port 10000
     pythonVersion: 3.10
