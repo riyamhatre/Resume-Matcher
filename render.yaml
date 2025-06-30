@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: resume-fastapi
+    name: resume-analyzer-api
     env: python
     buildCommand: |
       pip install -r requirements.txt
