@@ -1,36 +1,27 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from fastapi import FastAPI, File, UploadFile, Form
+from fastapi.responses import JSONResponse
+from resume_utils import analyze_resume
 import tempfile
 import os
-from analyzer import analyze_resume
-
-app = Flask(__name__)
-CORS(app)  # Allow access from GitHub Pages or other frontend
-from fastapi import FastAPI
 
 app = FastAPI()
 
 @app.get("/")
 def root():
-    return {"message": "API is running"}
+    return {"message": "Resume Analyzer is up and running 🚀"}
 
-@app.route("/analyze", methods=["POST"])
-def analyze():
+@app.post("/analyze/")
+async def analyze(file: UploadFile = File(...), job_description: str = Form(...)):
     try:
-        resume_file = request.files["resume"]
-        jd_text = request.form["job_description"]
+        # Save uploaded file temporarily
+        suffix = os.path.splitext(file.filename)[1]
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            contents = await file.read()
+            tmp.write(contents)
+            tmp_path = tmp.name
 
-        # Save uploaded resume to a temp file
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-            resume_file.save(tmp.name)
-            result = analyze_resume(tmp.name, jd_text)
-            os.remove(tmp.name)
-
-        return jsonify(result)
-
+        result = analyze_resume(tmp_path, job_description)
+        os.remove(tmp_path)
+        return JSONResponse(content=result)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(debug=False, host="0.0.0.0", port=port)
+        return JSONResponse(content={"error": str(e)}, status_code=500)
