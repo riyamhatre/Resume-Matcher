@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+pydantic
+pdfminer.six
+spacy
+sentence-transformers
+textstat
+spacy==3.7.2
+numpy<2
+scikit-learn
+nltk
+python-docx
