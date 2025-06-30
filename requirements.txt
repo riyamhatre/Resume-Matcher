@@ -10,3 +10,6 @@ numpy<2
 scikit-learn
 nltk
 python-docx
+flask
+flask-cors
+pdfminer.six
