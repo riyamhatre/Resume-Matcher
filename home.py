@@ -2,6 +2,8 @@ import streamlit as st
 from resume_analysis import analyze_resume
 import tempfile
 import os
+import sys
+sys.modules['sentencepiece'] = None
 
 st.set_page_config(page_title="Resume Matcher", layout="centered")
 
