@@ -6,3 +6,4 @@ scikit-learn
 textstat
 nltk
 python-docx
+pdfplumber
