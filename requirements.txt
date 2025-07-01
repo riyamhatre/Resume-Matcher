@@ -2,7 +2,7 @@ streamlit
 spacy==3.7.2
 numpy<2
 scikit-learn
-sentence-transformers==2.1.0  # avoids sentencepiece
+#sentence-transformers==2.1.0  # avoids sentencepiece
 textstat
 nltk
 python-docx
