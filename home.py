@@ -1,5 +1,5 @@
 import streamlit as st
-from resume_analysis import analyze_resume
+from analyzer import analyze_resume
 import tempfile
 import os
 import sys
